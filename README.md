@@ -32,6 +32,14 @@
 $ npm install
 ```
 
+## Run database
+
+config your database in .env (DATABASE_URL)
+
+```
+npx prisma generate
+```
+
 ## Compile and run the project
 
 ```bash

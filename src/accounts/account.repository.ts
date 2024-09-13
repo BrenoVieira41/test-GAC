@@ -50,4 +50,20 @@ export class AccountRepository {
       throw new InternalServerErrorException([error.message]);
     }
   }
+
+  async getExist(data: GetAccountInput) {
+    const { id, user_id } = data;
+    try {
+      const user = await this.prisma.account.findFirst({
+        where: {
+          is_active: true,
+          OR: [{ id }, { user_id }],
+        },
+        include: {user: true}
+      });
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException([error.message]);
+    }
+  }
 }

@@ -58,6 +58,7 @@ model Account {
 
 model Transfer {
   id           String     @id @default(uuid())
+  value        Decimal    @db.Decimal(10, 2)
   recipient    Account    @relation("RecipientAccount", fields: [recipient_id], references: [id])
   recipient_id String
   sender       Account    @relation("SenderAccount", fields: [sender_id], references: [id])

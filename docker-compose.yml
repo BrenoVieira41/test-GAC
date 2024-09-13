@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7777:7777"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:1234@host.docker.internal:5432/postgres?schema=GAC
+      JWT_SECRET: Tester0101
+      ENPOINT: http://localhost:7777
+    volumes:
+      - .:/app

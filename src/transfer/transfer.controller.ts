@@ -5,7 +5,7 @@ import { UseValidationPipe } from '../utils/decorators/validation.decorator';
 import { CreateTransferInput } from './dto/create-transfer.input';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Transfers } from './transfer.entity';
-import { GetTransferInput } from './dto/get-transfer.input';
+import { GetTransferInput, UserCode } from './dto/get-transfer.input';
 import { CREATE_SUCCESS_MESSAGE } from './transfer.constants';
 
 @Controller('transfer')
@@ -40,12 +40,14 @@ export class TransferController {
 
   @Post('pay/:code')
   @UseValidationPipe()
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({
     description: 'OK',
     type: CREATE_SUCCESS_MESSAGE,
   })
-  async pay(@Req() req, @Param('code') code: string, @Res() res): Promise<Transfers> {
-    const transfer = await this.transferService.pay(code);
+  async pay(@Req() req, @Param('code') code: string,  @Body() data: UserCode, @Res() res): Promise<Transfers> {
+    const user = req.user;
+    const transfer = await this.transferService.pay(code, user, data);
     return res.status(201).json(transfer);
   }
 }

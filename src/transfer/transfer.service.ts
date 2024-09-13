@@ -5,14 +5,17 @@ import { AccountRepository } from 'src/accounts/account.repository';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Transfers, TransferStatus } from './transfer.entity';
-import { GetTransferInput } from './dto/get-transfer.input';
-import { ACCOUNT_NOT_FOUND, CREATE_ERROR_MESSAGE, CREATE_SUCCESS_MESSAGE, NOT_BALANCE_TO_TRANSFER, PAY_ERROR_MESSAGE, SEND_ACCOUNT_NOT_FOUND, TRANSFER_STATUS, TRANSFER_TO_ME, VALUE_NOT_FOUND } from './transfer.constants';
+import { GetTransferInput, UserCode } from './dto/get-transfer.input';
+import { ACCOUNT_NOT_FOUND, CODE_ERROR_MESSAGE, CREATE_ERROR_MESSAGE, CREATE_SUCCESS_MESSAGE, NOT_BALANCE_TO_TRANSFER, PAY_ERROR_MESSAGE, SEND_ACCOUNT_NOT_FOUND, TRANSFER_STATUS, TRANSFER_TO_ME, VALUE_NOT_FOUND } from './transfer.constants';
+import { Users } from '../user/user.entity';
+import { UserRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class TransferService {
   constructor(
     private readonly transferRepository: TransferRepository,
     private readonly accountRepository: AccountRepository,
+    private readonly userRepository: UserRepository,
     private prisma: PrismaService,
   ) {}
 
@@ -50,8 +53,11 @@ export class TransferService {
     return transfer;
   }
 
-  async pay(code: string): Promise<String> {
+  async pay(code: string, user: Users, data: UserCode): Promise<String> {
     const transfer = await this.transferRepository.getTransferByCode(code);
+    const senderUser = await this.userRepository.get({ id: user.id });
+
+    if (senderUser.code !== data.code) throw new BadRequestException([CODE_ERROR_MESSAGE])
 
     if (transfer.status !== 'pending') throw new BadRequestException([TRANSFER_STATUS]);
     return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {

@@ -1,6 +1,7 @@
 const ID_ERROR_MESSAGE = 'Id inválido.';
 const VALUE_ERROR_MESSAGE = 'Valor inválido.';
 const RECIPIENT_ERRO_MESSAGE = 'Destinatário inválido.';
+const CODE_ERROR_MESSAGE = 'Código de usuário inválido.';
 
 const ACCOUNT_NOT_FOUND = 'Sua conta não foi encontrada.';
 const VALUE_NOT_FOUND = 'Nenhum valor recebido.';
@@ -18,6 +19,7 @@ export {
   ID_ERROR_MESSAGE,
   VALUE_ERROR_MESSAGE,
   RECIPIENT_ERRO_MESSAGE,
+  CODE_ERROR_MESSAGE,
   ACCOUNT_NOT_FOUND,
   SEND_ACCOUNT_NOT_FOUND,
   VALUE_NOT_FOUND,

@@ -1,4 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { CreateUserInput } from './dto/create-user.input';
 import { hash, compareSync } from 'bcrypt';
@@ -7,16 +13,24 @@ import {
   BORNDATE_YEAR_INVALID,
   CODE_ERROR_MESSAGE,
   CREATE_ERROR_MESSAGE,
+  DELETE_ERROR_MESSAGE,
+  DELETE_SUCCESS_MESSAGE,
+  GET_ERROR_MESSAGE,
+  PASSWORD_NOT_FOUND,
+  UPDATE_ERROR_MESSAGE,
+  UPDATE_SUCCESS_MESSAGE,
+  USER_NOT_FOUND,
+  VALUE_NOT_FOUND,
 } from './user.constants';
 import * as moment from 'moment';
 import { UserLogin } from '../auth/dto/login-user.input';
+import { Users } from './user.entity';
+import { GetUserInput } from './dto/get-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
-
-  //is_active se estiver ativando quando for ativo
-  //is_active se estiver desativando quando estiver não ativo
 
   async create(data: CreateUserInput): Promise<any> {
     data.borndate = this.userBornDate(String(data.borndate));
@@ -35,9 +49,61 @@ export class UserService {
     }
   }
 
-  async validateUser(data: UserLogin) {
-    const user = await this.userRepository.get({ email: data.email });
+  async getUser(data: GetUserInput) {
+    const { email, id } = data;
 
+    if (!email && !id) throw new UnauthorizedException([VALUE_NOT_FOUND]);
+
+    try {
+      const user: Users = await this.userRepository.get({ id: id });
+      Reflect.deleteProperty(user, 'password');
+
+      return user;
+    } catch (error) {
+      console.error(error.message);
+      throw new InternalServerErrorException([GET_ERROR_MESSAGE]);
+    }
+  }
+
+  async update(id: string, data: UpdateUserInput) {
+    if (data.borndate) {
+      data.borndate = this.userBornDate(String(data.borndate));
+    }
+    if (data.code) {
+      this.userCodeValdiate(data.code);
+    }
+    if (!Object.values(data).length) throw new BadRequestException([VALUE_NOT_FOUND]);
+    try {
+      const user = await this.userRepository.get({ id });
+
+      await this.userRepository.update(id, data);
+
+      return UPDATE_SUCCESS_MESSAGE;
+    } catch (error) {
+      console.error(error.message);
+      throw new InternalServerErrorException([UPDATE_ERROR_MESSAGE]);
+    }
+  }
+
+  async delete(id: string): Promise<String> {
+    let user = await this.userRepository.get({ id });
+
+    if (!user) throw new BadRequestException([USER_NOT_FOUND]);
+    try {
+      await this.userRepository.delete(id);
+
+      return DELETE_SUCCESS_MESSAGE;
+    } catch (error) {
+      console.error(error.message);
+      throw new InternalServerErrorException([DELETE_ERROR_MESSAGE]);
+    }
+  }
+
+  async validateUser(data: UserLogin): Promise<Users | null> {
+    const user: Users = await this.userRepository.get({ email: data.email });
+
+    if (!user) throw new UnauthorizedException([USER_NOT_FOUND]);
+    if (!data.password) throw new BadRequestException([PASSWORD_NOT_FOUND]);
 
     if (user && compareSync(data.password, user.password)) return { password: data.password, ...user };
 
@@ -57,10 +123,10 @@ export class UserService {
   }
 
   private userCodeValdiate(code: string): any {
-    if (code.length !== 4 || !/^\d{4}$/.test(code)) throw new BadRequestException([CODE_ERROR_MESSAGE]); // esperado apénas 4 digitos.
+    if (code.length !== 4 || !/^\d{4}$/.test(code)) throw new BadRequestException([CODE_ERROR_MESSAGE]);
 
     const numbers = new Set(code);
-    if (numbers.size !== code.length) throw new BadRequestException([CODE_ERROR_MESSAGE]); // remove os numeros repetidos valida se sumiu algo;
+    if (numbers.size !== code.length) throw new BadRequestException([CODE_ERROR_MESSAGE]);
   }
 
   // private validateYears(bornDate: string): any {

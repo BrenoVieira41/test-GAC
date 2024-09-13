@@ -39,7 +39,7 @@ $ npm install
 $ npm run start
 
 # watch mode
-$ npm run start:dev
+$ npm run dev
 
 # production mode
 $ npm run start:prod
@@ -83,3 +83,23 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+nest generate module transfer --no-spec
+nest generate controller transfer --no-spec
+nest generate service transfer --no-spec
+
+accounts:
+	- id,
+	- user_id,
+	- value,
+ 	- created_at,
+	- is_active
+transfers:
+	- id,
+	- recipient - destinatario,
+	- sender - remetente,
+	- date,
+	- code(6 numeros)
+QRcode agradecendo:
+	link que ao escanear, envia para uma tela agradecendo pelo pagamento.
+---

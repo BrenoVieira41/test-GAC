@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum StatusEnum {
+  pending
+  paid
+  refund
+
+  @@map("transfer_status_enum")
+}
+
 model User {
   id         String    @id @default(uuid())
   name       String
@@ -14,10 +22,49 @@ model User {
   borndate   DateTime
   password   String
   code       String
-  is_active  Boolean   @default(false)
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now())
   deleted_at DateTime?
 
+  logs    Logs[]    @relation("UserLogs")
+  account Account[] @relation("UserAccount")
+
   @@map("users")
+}
+
+model Logs {
+  id       Int      @id @default(autoincrement())
+  user_id  String
+  user     User     @relation(fields: [user_id], references: [id], onDelete: Cascade, name: "UserLogs")
+  endpoint String
+  input    Json
+  date     DateTime @default(now())
+
+  @@map("logs")
+}
+
+model Account {
+  id                   String     @id @default(uuid())
+  value                String
+  created_at           DateTime   @default(now())
+  is_active            Boolean
+  user_id              String     @unique
+  user                 User       @relation(fields: [user_id], references: [id], onDelete: Cascade, name: "UserAccount")
+  sentTransactions     Transfer[] @relation("SenderAccount")
+  receivedTransactions Transfer[] @relation("RecipientAccount")
+
+  @@map("accounts")
+}
+
+model Transfer {
+  id           String     @id @default(uuid())
+  recipient    Account    @relation("RecipientAccount", fields: [recipient_id], references: [id])
+  recipient_id String
+  sender       Account    @relation("SenderAccount", fields: [sender_id], references: [id])
+  sender_id    String
+  date         DateTime   @default(now())
+  code         String
+  status       StatusEnum
+
+  @@map("transfers")
 }

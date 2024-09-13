@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { GetUserInput } from './dto/get-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UserRepository {
@@ -11,6 +12,22 @@ export class UserRepository {
     try {
       const user = await this.prisma.user.create({ data });
       return user;
+    } catch (error) {
+      throw new InternalServerErrorException([error]);
+    }
+  }
+
+  async update(id: string, data: UpdateUserInput) {
+    try {
+      return this.prisma.user.update({ where: { id }, data });
+    } catch (error) {
+      throw new InternalServerErrorException([error]);
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      return this.prisma.user.update({ where: { id }, data: { deleted_at: new Date() } });
     } catch (error) {
       throw new InternalServerErrorException([error]);
     }

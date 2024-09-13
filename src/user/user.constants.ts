@@ -14,8 +14,8 @@ const LOGIN_ERROR_MESSAGE = 'E-mail e ou senha inválido(s).';
 const VALUE_NOT_FOUND = 'Nenhum valor recebido.';
 
 const CREATE_ERROR_MESSAGE = 'Falha ao criar usuário.';
-const UPDATE_ERROR_MESSAGE = 'Falha ao alterar o usuário';
-const DELETE_ERROR_MESSAGE = 'Falha ao deletar o usuário';
+const UPDATE_ERROR_MESSAGE = 'Falha ao alterar o usuário.';
+const DELETE_ERROR_MESSAGE = 'Falha ao deletar o usuário.';
 const GET_ERROR_MESSAGE = 'Falha ao buscar o usuário.';
 const FIND_ERROR_MESSAGE = 'Falha ao listar usuários';
 const LOGIN_TEMPLATE_ERROR = 'Falha ao logar.'

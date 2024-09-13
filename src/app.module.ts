@@ -8,19 +8,16 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthLoggerInterceptor } from './auth/auth-logger.interceptor';
 import { AccountModule } from './accounts/account.module';
 import { TransferModule } from './transfer/transfer.module';
-import { AccountController } from './account/account.controller';
-import { AccountService } from './account/account.service';
 
 @Module({
   imports: [PrismaModule, UserModule, AuthModule, AccountModule, TransferModule],
-  controllers: [AppController, AccountController],
+  controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: AuthLoggerInterceptor,
     },
-    AccountService,
   ],
 })
 export class AppModule {}

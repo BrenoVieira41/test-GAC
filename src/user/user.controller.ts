@@ -32,7 +32,7 @@ export class UserController {
   })
   async me(@Req() req, @Res() res): Promise<Users> {
     const user = await this.userService.getUser(req.user);
-    return res.status(201).json(user);
+    return res.status(200).json(user);
   }
 
   @Put()
@@ -45,7 +45,7 @@ export class UserController {
     const { id } = req.user;
 
     const user = await this.userService.update(id, data);
-    return res.status(201).json(user);
+    return res.status(200).json(user);
   }
 
   @Delete()

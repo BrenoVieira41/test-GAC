@@ -13,7 +13,7 @@ export class UserRepository {
       const user = await this.prisma.user.create({ data });
       return user;
     } catch (error) {
-      throw new InternalServerErrorException([error]);
+      throw new InternalServerErrorException([error.message]);
     }
   }
 
@@ -21,7 +21,7 @@ export class UserRepository {
     try {
       return this.prisma.user.update({ where: { id }, data });
     } catch (error) {
-      throw new InternalServerErrorException([error]);
+      throw new InternalServerErrorException([error.message]);
     }
   }
 
@@ -29,7 +29,7 @@ export class UserRepository {
     try {
       return this.prisma.user.update({ where: { id }, data: { deleted_at: new Date() } });
     } catch (error) {
-      throw new InternalServerErrorException([error]);
+      throw new InternalServerErrorException([error.message]);
     }
   }
 
@@ -44,7 +44,7 @@ export class UserRepository {
       });
       return user;
     } catch (error) {
-      throw new InternalServerErrorException([error]);
+      throw new InternalServerErrorException([error.message]);
     }
   }
 }

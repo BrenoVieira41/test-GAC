@@ -45,9 +45,9 @@ model Logs {
 
 model Account {
   id                   String     @id @default(uuid())
-  value                String
+  value                Decimal    @db.Decimal(10, 2)
   created_at           DateTime   @default(now())
-  is_active            Boolean
+  is_active            Boolean    @default(false)
   user_id              String     @unique
   user                 User       @relation(fields: [user_id], references: [id], onDelete: Cascade, name: "UserAccount")
   sentTransactions     Transfer[] @relation("SenderAccount")
@@ -64,7 +64,7 @@ model Transfer {
   sender_id    String
   date         DateTime   @default(now())
   code         String
-  status       StatusEnum
+  status       StatusEnum @default(pending)
 
   @@map("transfers")
 }

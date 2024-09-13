@@ -35,6 +35,7 @@ export class UserService {
   async create(data: CreateUserInput): Promise<any> {
     data.borndate = this.userBornDate(String(data.borndate));
     this.userCodeValdiate(data.code);
+    await this.userAlreadyExist(data.email);
 
     try {
       const { password } = data;
@@ -66,13 +67,15 @@ export class UserService {
   }
 
   async update(id: string, data: UpdateUserInput) {
+    if (!Object.values(data).length) throw new BadRequestException([VALUE_NOT_FOUND]);
     if (data.borndate) {
       data.borndate = this.userBornDate(String(data.borndate));
     }
     if (data.code) {
       this.userCodeValdiate(data.code);
     }
-    if (!Object.values(data).length) throw new BadRequestException([VALUE_NOT_FOUND]);
+    if (data.email) await this.userAlreadyExist(data.email);
+
     try {
       const user = await this.userRepository.get({ id });
 
@@ -83,6 +86,12 @@ export class UserService {
       console.error(error.message);
       throw new InternalServerErrorException([UPDATE_ERROR_MESSAGE]);
     }
+  }
+
+  private async userAlreadyExist(email: string) {
+    const userAlreadyExist = await this.userRepository.get({ email });
+
+    if (userAlreadyExist) throw new BadRequestException(['usuario já existe']);
   }
 
   async delete(id: string): Promise<String> {
